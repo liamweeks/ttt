@@ -88,6 +88,7 @@ void display_board(int board[], int active_tile) {
     int i;
     int spots = 9;
 
+    printf("|");
     for(i = 0; i < spots; i++) {
 
         char symbol;
@@ -118,10 +119,10 @@ void display_board(int board[], int active_tile) {
         // determine new lines
         switch(i) {
             case 2:
-                printf("\n");
+                printf("|\n|");
                 break;
             case 5:
-                printf("\n");
+                printf("|\n|");
                 break;
             default:
                 break;
@@ -129,7 +130,7 @@ void display_board(int board[], int active_tile) {
 
 
     }
-    printf("\n");
+    printf("|\n");
 
 }
 
