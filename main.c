@@ -4,6 +4,8 @@
 #include <termios.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <time.h>
+
 
 
 #define E 1 // 3(1) = 3
@@ -16,6 +18,10 @@ void enable_raw_mode() {
     tcgetattr(STDIN_FILENO, &raw); // read terminal attributes
     raw.c_lflag &= ~(ICANON | ECHO); // disable canonical and echo modes
     tcsetattr(STDOUT_FILENO, TCSAFLUSH, &raw); // Apply new settings
+}
+
+int random_move() {
+    return (int) time(NULL) % 9;
 }
 
 int sum_line(int board[], int start, int end, int step, char player) {
@@ -88,7 +94,7 @@ void display_board(int board[], int active_tile) {
 
         switch (board[i]) {
             case E:
-                symbol = '0' + i; // print the char version of the number
+                symbol = ' ';//'0' + i; // print the char version of the number
                 break;
 
             case X:
@@ -135,6 +141,8 @@ int main() {
     };
 
     int active_tile = 0;
+    int computer_move;
+    bool placed = false;
     char c;
 
     while(1) {
@@ -168,9 +176,23 @@ int main() {
                 break;
             case '\n':
                 place_letter(active_tile, X, board);
+                placed = true;
+                break;
             default:
                 break;
         }
+
+        if (placed) {
+            computer_move = random_move();
+
+            while(board[computer_move] != E) {
+                computer_move = random_move();
+            }
+
+            place_letter(computer_move, O, board);
+            placed = false;
+        }
+
 
     }
 }
