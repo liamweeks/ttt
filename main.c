@@ -1,5 +1,4 @@
 #include <complex.h>
-#include <iso646.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
@@ -7,9 +6,9 @@
 #include <stdbool.h>
 
 
-#define E 'E'
-#define X 'X'
-#define O 'O'
+#define E 1 // 3(1) = 3
+#define X 2 // 3(2) = 6
+#define O 3 // 3(3) = 9
 
 
 void enable_raw_mode() {
@@ -17,6 +16,48 @@ void enable_raw_mode() {
     tcgetattr(STDIN_FILENO, &raw); // read terminal attributes
     raw.c_lflag &= ~(ICANON | ECHO); // disable canonical and echo modes
     tcsetattr(STDOUT_FILENO, TCSAFLUSH, &raw); // Apply new settings
+}
+
+int sum_line(int board[], int start, int end, int step, char player) {
+    int magic_square[] = {
+        4, 9, 2,
+        3, 5, 7,
+        8, 1, 6,
+    };
+
+    int total = 0;
+    for(int i = start; i <= end; i += step) {
+        if (board[i] == player) {
+            total += magic_square[i];
+        }
+    }
+
+    return total;
+}
+
+bool check_win(int board[], char player) {
+
+   int possible_win_states[] = {
+    // Horizontal
+    sum_line(board, 0, 2, 1, player),
+    sum_line(board, 3, 5, 1, player),
+    sum_line(board, 6, 8, 1, player),
+
+    // Vertical
+    sum_line(board, 0, 6, 3, player),
+    sum_line(board, 1, 7, 3, player),
+    sum_line(board, 2, 8, 3, player),
+
+    // Diagonal
+    sum_line(board, 0, 8, 4, player),
+    sum_line(board, 2, 6, 2, player),
+   };
+
+   for(int i = 0; i < sizeof(possible_win_states)/sizeof(int); i++) {
+       if (possible_win_states[i] == 15) { return true;}
+   }
+    return false; // didn't find 3 in a row
+
 }
 
 bool legal_move(int active_tile, int movement) {
@@ -100,6 +141,15 @@ int main() {
         system("clear");
         display_board(board, active_tile);
 
+        if (check_win(board, X)) {
+            printf("Player X won!\n");
+            break;
+        }
+        if (check_win(board, O)) {
+            printf("Player O won!\n");
+            break;
+        }
+
         c = get_input();
 
 
@@ -121,5 +171,6 @@ int main() {
             default:
                 break;
         }
+
     }
 }
